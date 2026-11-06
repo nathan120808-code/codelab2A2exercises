@@ -9,24 +9,37 @@ main.configure(
     bg='black'
 )
 
-# questions
-questions = {
-    "Easy": [
-        {"What is 2 = 2"}
-    ],
-    "Intermediate": [
-        {}
-    ],
-    "Advanced": [
-        {}
-    ]
-
-}
-
-
-#extras
+# global variables
 title_font = ('Helvetica', 40, 'bold')
 button_font = ('Monospace', 15)
+
+# questions
+# NOTE: all the questions were generated using Gemini
+QUESTIONS = {
+    "easy": [
+        {"Q: What is 2 + 4"}
+        {"Q: How many sides does a hexagon have?"}
+        {"Q: What is 7 × 8?"}
+        
+    ],
+    "intermediate": [
+        {}
+    ],
+    "advanced": [
+        {}
+    ]
+}
+
+def open_questions(difficulty):
+    """opens seperate window for the difficulty player chooses"""
+    win = tk.Toplevel(main)
+    win.title(f"{difficulty.capitalize()} Questions")
+    win.geometry(('600x300'))
+
+    questions = QUESTIONS[difficulty]
+
+
+
 
 #title
 title1 = Label(main, text="Test your Math!",
