@@ -9,16 +9,17 @@ main.configure(
     bg='black'
 )
 
-# global variables
+# global variables for customization
 title_font = ('Helvetica', 40, 'bold')
 button_font = ('Monospace', 15)
 
 # questions
 # NOTE: all the questions were generated using Gemini
+#DICTIONARY for the questions - acting as a global dictionary
 QUESTIONS = {
     "easy": [
-        {"Q: What is 2 + 4"}
-        {"Q: How many sides does a hexagon have?"}
+        {"Q: What is 2 + 4"},
+        {"Q: How many sides does a hexagon have?"},
         {"Q: What is 7 × 8?"}
         
     ],
@@ -32,11 +33,25 @@ QUESTIONS = {
 
 def open_questions(difficulty):
     """opens seperate window for the difficulty player chooses"""
-    win = tk.Toplevel(main)
+    #window configs
+    win = Tk.Toplevel(main)
     win.title(f"{difficulty.capitalize()} Questions")
     win.geometry(('600x300'))
 
     questions = QUESTIONS[difficulty]
+    state = {"index": 0, "score": 0} #tracks player's progress in teh quiz - index holds the position of teh current question the player is in, score is how many answers the player got right
+
+
+    q_label = Tk.Label(win, text="", font=("Arial", 14), wraplength=300)
+    q_label.pack(pady=15)
+
+    answer_entry = Tk.Entry(win)
+    answer_entry.pack()
+
+    def show_question():
+        """this function enables the questions from the global dictionary to be directly called"""
+        q_label.config(text=questions[state["index"]]["q"])
+        answer_entry.delete(0, Tk.END)
 
 
 
