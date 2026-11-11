@@ -39,7 +39,10 @@ def open_questions(difficulty):
     #window configs
     win = tk.Toplevel(main) #toplevel is a widget which creates a seperate pop up window
     win.title(f"{difficulty.capitalize()} Questions") #sets window title
-    win.geometry(('600x300')) #window dimensions
+    win.geometry(('600x600')) #window dimensions
+    win.configure()
+    win.transient(main) #prioritises this window over the main menu screen
+    win.grab_set() #blocks any interaction with the main window until the questions are either completed or closed
 
     questions = QUESTIONS[difficulty] 
     state = {"index": 0, "score": 0} #tracks player's progress in teh quiz - index holds the position of teh current question the player is in, score is how many answers the player got right
@@ -69,8 +72,9 @@ def open_questions(difficulty):
 
         #these conditions check when to end 
         state['index'] +=1 #this adds an extra 1 in the index so it doesnt start at 0
+        print("index:", state['index'], "total:", len(questions))
         if state['index'] < len(questions): #this checks if there are more questions (IF index pos is less than the amount of questions, then show_question() is activated)
-            show_question
+            show_question()
         else:
             messagebox.showinfo(
                 "Done!", f"Score: {state['score']}/{len(questions)}" )
