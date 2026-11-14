@@ -1,51 +1,78 @@
-from tkinter import *
+import tkinter as tk
+import os
+import random
 
-main = Tk()
+main = tk.Tk()
 main.title("Joke Generator")
 main.geometry("800x500")
 main.resizable(0,0)
-main.config()
+main.config(
+    bg="#1A2A3A"
+)
 
-#Global dictionary
-JOKES = [
-    {"J": "Why did the chicken cross the road?", "A": "To get to the other side."},
-    {"J": "What happens if you boil a clown?", "A": "You get a laughing stock."},
-    {"J": "Why did the car get a flat tire?", "A": "Because there was a fork in the road!"},
-    {"J": "How did the hipster burn his mouth?", "A": "He ate his pizza before it was cool."},
-    {"J": "What did the janitor say when he jumped out of the closet?", "A": "SUPPLIES!!!!"},
-    {"J": "Have you heard about the band 1023MB?", "A": "It's probably because they haven't got a gig yet…"},
-    {"J": "Why does the golfer wear two pants?", "A": "Because he's afraid he might get a \"Hole-in-one.\""},
-    {"J": "Why should you wear glasses to maths class?", "A": "Because it helps with division."},
-    {"J": "Why does it take pirates so long to learn the alphabet?", "A": "Because they could spend years at C."},
-    {"J": "Why did the woman go on the date with the mushroom?", "A": "Because he was a fun-ghi."},
-    {"J": "Why do bananas never get lonely?", "A": "Because they hang out in bunches."},
-    {"J": "What did the buffalo say when his kid went to college?", "A": "Bison."},
-    {"J": "Why shouldn't you tell secrets in a cornfield?", "A": "Too many ears."},
-    {"J": "What do you call someone who doesn't like carbs?", "A": "Lack-Toast Intolerant."},
-    {"J": "Why did the can crusher quit his job?", "A": "Because it was soda pressing."},
-    {"J": "Why did the birthday boy wrap himself in paper?", "A": "He wanted to live in the present."},
-    {"J": "What does a house wear?", "A": "A dress."},
-    {"J": "Why couldn't the toilet paper cross the road?", "A": "Because it got stuck in a crack."},
-    {"J": "Why didn't the bike want to go anywhere?", "A": "Because it was two-tired!"},
-    {"J": "Want to hear a pizza joke?", "A": "Nahhh, it's too cheesy!"},
-    {"J": "Why are chemists great at solving problems?", "A": "Because they have all of the solutions!"},
-    {"J": "Why is it impossible to starve in the desert?", "A": "Because of all the sand which is there!"},
-    {"J": "What did the cheese say when it looked in the mirror?", "A": "Halloumi!"},
-    {"J": "Why did the developer go broke?", "A": "Because he used up all his cache."},
-    {"J": "Did you know that ants are the only animals that don't get sick?", "A": "It's true! It's because they have little antibodies."},
-    {"J": "Why did the donut go to the dentist?", "A": "To get a filling."},
-    {"J": "What do you call a bear with no teeth?", "A": "A gummy bear!"},
-    {"J": "What does a vegan zombie like to eat?", "A": "Graaains."},
-    {"J": "What do you call a dinosaur with only one eye?", "A": "A Do-you-think-he-saw-us!"},
-    {"J": "Why should you never fall in love with a tennis player?", "A": "Because to them... love means NOTHING!"},
-    {"J": "What did the full glass say to the empty glass?", "A": "You look drunk."},
-    {"J": "What's a potato's favorite form of transportation?", "A": "The gravy train"},
-    {"J": "What did one ocean say to the other?", "A": "Nothing, they just waved."},
-    {"J": "What did the right eye say to the left eye?", "A": "Honestly, between you and me something smells."},
-    {"J": "What do you call a dog that's been run over by a steamroller?", "A": "Spot!"},
-    {"J": "What's the difference between a hippo and a zippo?", "A": "One's pretty heavy and the other's a little lighter"},
-    {"J": "Why don't scientists trust Atoms?", "A": "They make up everything."}
-]
+#GLOBAL dataset (this was figured using gemini)
+JOKE_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "randomJokes.txt")
 
-def joke_gen():
-    
+
+def joke_gen(path):
+    "Reads teh txt file - follows this setup for each line: Setup? punchline"
+
+    jokes = [] #starts with an empty list
+    with open(path, encoding="utf-8") as f: #opens the joke file and sets its encoding
+        for line in f: #goes through it one line at a time - strip() then removes the trailing newline, if statement skips blank lines or ones without "?"
+            line = line.strip()
+            if not line or "?" not in line:
+                continue
+            #these were figured using gemini(the 2 lines below this point)
+            cut = line.index("?") + 1 #this moves the cutting point passed the "?" point in each line
+            jokes.append((line[:cut].strip(),line[cut:].strip())) #this directs where should the lines be cut, and it sets them into a pair eg: jokes.append(setup, punchline)
+    return jokes
+
+try:
+    JOKES = joke_gen(JOKE_DATA) #this allows the main file to be called, only locally - its then assigned into a global variable as JOKES
+except OSError: #otherwise if it isnt found locally, it will raise an oserror - turning JOKES into an empty list
+    JOKES = []
+
+current_joke = None #will be used in future function
+
+
+
+#FRONTEND
+
+#title
+title1 = tk.Label(main, text="Joke Generator",font=('Robotica', 25), fg= "#ffffff", bg= "#1A2A3A")
+title1.pack(pady=25)
+
+#joke button
+alexa_b = tk.Button(main, text="Alexa tell me a joke", font=('Robotica', 16), command=joke_new)
+alexa_b.pack(pady=10)
+
+
+#JOKE DISPLAY
+#joke setup
+question_label1 = tk.Label(main, text="",font=('Robotica', 18), fg= "#ffffff", bg= "#1A2A3A", wraplength=700,justify="center")
+question_label1.pack(pady=(20,10))
+
+#joke punchline
+question_label2 = tk.Label(main, text="",font=('Robotica', 18,'italic'), fg= "#ffffff", bg= "#1A2A3A", wraplength=700, justify='center')
+question_label2.pack(pady=10)
+
+#ROW AND BUTTONS
+button_row = tk.Frame(main, bg='#1A2A3A')
+button_row.pack(pady=25)
+
+#punchline
+gen_button1= tk.Button(button_row, text="Show Punchline", font=('Robotica', 15), width = 14, state="disabled", command=show_punchline)
+gen_button1.grid(row=0,column=0,padx=8)
+#next button
+gen_button2 = tk.Button(button_row, text="Next Joke", font=('Robotica', 15), width = 14, state="disabled", command=joke_new)
+gen_button2.grid(row=0,column=1,padx=8)
+#quit button
+gen_button3 = tk.Button(button_row, text="Quit", font=('Robotica', 15), width = 14, command=quit_app)
+gen_button3.grid(row=0,column=2,padx=8)
+
+if not JOKES: #IF the jokes txt file is not available locally - this statement will activate, disabling teh joke button and displaying the unavail text
+    alexa_b.config(state="disabled")
+    question_label1.config(text="Couldn't find any jokes. Make sure randomJokes.txt is in the local folder")
+
+main.mainloop()
