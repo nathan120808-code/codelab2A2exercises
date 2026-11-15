@@ -35,7 +35,27 @@ except OSError: #otherwise if it isnt found locally, it will raise an oserror - 
 
 current_joke = None #will be used in future function
 
+def joke_new():
+    "Picks the joke at random consistently, this is for teh generator button"
+    global current_joke
 
+    choices = [j for j in JOKES if j != current_joke] or JOKES #this goes through every joke - ensuring the ones that arent teh active joke stay on display. It prevents repetition of the same joke
+                                                               #JOKES is instead a fallback if the local txt is not available - which returns an empty list - this is to prevent crashing
+    current_joke = random.choice(choices) #picks random pair from the collected list
+
+    question_label1.config(text=current_joke[0])
+    question_label2.config(text="")
+    gen_button1.config(state='normal')
+    gen_button2.config(state='normal')
+
+def show_punchline():
+    """show punchlien below question_label1"""
+    if current_joke:
+        question_label2.config(text=current_joke[1])
+        gen_button1.config(state='disabled') #disabled button if punchline is shown
+
+def quit_app():
+    main.destroy()
 
 #FRONTEND
 

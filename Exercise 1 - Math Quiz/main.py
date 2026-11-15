@@ -1,4 +1,5 @@
 #library imports
+import random
 import tkinter as tk
 from tkinter import messagebox
 
@@ -15,31 +16,80 @@ main.configure(
 title_font = ('Helvetica', 40, 'bold')
 button_font = ('Monospace', 15)
 
-# questions
-# NOTE: all the questions were generated using Gemini
-#DICTIONARY for the questions - acting as a global dictionary
-QUESTIONS = {
-    "easy": [
-        {"Q":  "What is 2 + 4", "A": "6" },
-        {"Q": "How many sides does a hexagon have?", "A": "6"},
-        {"Q": "What is 7 × 8?", "A": "56"}
-        
-    ],
-    "intermediate": [
-        {}
-    ],
-    "advanced": [
-        {}
-    ]
+#GLOBAL VARIABLES
+#settings for the game
+TOTAL_QUES = 10 #10 times 10 equaes to 100 - the maximum score in quiz
+FIRST_TRY = 10 #will be multiplied against total/ 10 points for first try
+SECOND_TRY = 5 #will be multiplied against total/ 5 points on second
+
+#this sets the range of the questions - easy means single digit numbers to be solved, moderate means double - so on so forth
+RANGES = {
+    'easy':(1,9),
+    'moderate':(10,99),
+    'advanced':(1000,9999)
 }
 
+#FUNCTIONS
+
+def randomint(difficulty):
+    """returns rnadom number, min max depends on the difficult"""
+    low, high = RANGES[difficulty]
+    return random.randint(low,high)
+
+def decideOp():
+    """randomly chooses if teh operation is addition or subtraction"""
+    return random.choice(['+','-'])
+
+def display_menu():
+    """displays main ui"""
+
+    #clears everything on the main win when player chooses to play again
+    for widget in main.winfo_children():
+        widget.destroy()
+
+    #title
+    title1 = tk.Label(main, text="Test your Math!",
+                font = title_font
+                ).pack(pady= 30)
+
+    #difficulty levels - naming variables and assigning attributes and positioning
+    dif1 = tk.Button(main, text="Easy",
+                bg = 'green',
+                font= button_font,
+                width= 20,
+                height= 2,
+                command=lambda: open_questions("easy")).pack(pady= 10)
+    dif2 = tk.Button(main, text="Intermediate",
+                bg = 'yellow',
+                font= button_font,
+                width= 20,
+                height= 2,
+                command=lambda: open_questions('intermediate')).pack(pady= 10)
+    dif3 = tk.Button(main, text='Advanced',
+                bg='red',
+                font= button_font,
+                width= 20,
+                height= 2,
+                command=lambda: open_questions('advanced')).pack(pady= 10)
+
+def display_problem(q-label, answer_entry, attempt_label, state, difficulty):
+    "creates random problems, is displayed and clears answer box. and returns the correct answer to the problem"
+
+    a = randomint(difficulty)
+    b = randomint(difficulty)
+    operation = decideOp()
+
+    if operation == '+':
+        correct_answer = a + b
+    else:
+        correct_answer = a - b
 
 def open_questions(difficulty):
     """opens seperate window for the difficulty player chooses"""
     #window configs
     win = tk.Toplevel(main) #toplevel is a widget which creates a seperate pop up window
     win.title(f"{difficulty.capitalize()} Questions") #sets window title
-    win.geometry(('600x600')) #window dimensions
+    win.geometry(('600x300')) #window dimensions
     win.configure()
     win.transient(main) #prioritises this window over the main menu screen
     win.grab_set() #blocks any interaction with the main window until the questions are either completed or closed
@@ -87,30 +137,6 @@ def open_questions(difficulty):
 
 
 
-#title
-title1 = tk.Label(main, text="Test your Math!",
-               font = title_font
-               ).pack(pady= 30)
-
-#difficulty levels - naming variables and assigning attributes and positioning
-dif1 = tk.Button(main, text="Easy",
-              bg = 'green',
-              font= button_font,
-              width= 20,
-              height= 2,
-              command=lambda: open_questions("easy")).pack(pady= 10)
-dif2 = tk.Button(main, text="Intermediate",
-            bg = 'yellow',
-            font= button_font,
-            width= 20,
-            height= 2,
-            command=lambda: open_questions('intermediate')).pack(pady= 10)
-dif3 = tk.Button(main, text='Advanced',
-              bg='red',
-              font= button_font,
-              width= 20,
-              height= 2,
-              command=lambda: open_questions('advanced')).pack(pady= 10)
 
 
 
