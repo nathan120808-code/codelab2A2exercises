@@ -39,8 +39,9 @@ def joke_new():
     "Picks the joke at random consistently, this is for teh generator button"
     global current_joke
 
+    #this line is developed with claude
     choices = [j for j in JOKES if j != current_joke] or JOKES #this goes through every joke - ensuring the ones that arent teh active joke stay on display. It prevents repetition of the same joke
-                                                               #JOKES is instead a fallback if the local txt is not available - which returns an empty list - this is to prevent crashing
+                                                               #JOKES is instead a fallback if the list is empty - which only happens if the list is one joke
     current_joke = random.choice(choices) #picks random pair from the collected list
 
     question_label1.config(text=current_joke[0])

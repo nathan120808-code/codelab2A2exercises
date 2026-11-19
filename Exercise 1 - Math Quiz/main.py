@@ -36,11 +36,11 @@ def randomint(difficulty):
     low, high = RANGES[difficulty]
     return random.randint(low,high)
 
-def decideOp():
+def decideOperation():
     """randomly chooses if teh operation is addition or subtraction"""
     return random.choice(['+','-'])
 
-def display_menu():
+def displayMenu():
     """displays main ui"""
 
     #clears everything on the main win when player chooses to play again
@@ -64,7 +64,7 @@ def display_menu():
                 font= button_font,
                 width= 20,
                 height= 2,
-                command=lambda: open_questions('intermediate')).pack(pady= 10)
+                command=lambda: open_questions('moderate')).pack(pady= 10)
     dif3 = tk.Button(main, text='Advanced',
                 bg='red',
                 font= button_font,
@@ -72,17 +72,79 @@ def display_menu():
                 height= 2,
                 command=lambda: open_questions('advanced')).pack(pady= 10)
 
-def display_problem(q-label, answer_entry, attempt_label, state, difficulty):
-    "creates random problems, is displayed and clears answer box. and returns the correct answer to the problem"
 
-    a = randomint(difficulty)
+def displayProblem(q_label, answer_entry, attempt_label, state, difficulty):
+    """creates random problems, is displayed and clears answer box. and returns the correct answer to the problem"""
+
+    #a and b are assigned random numbers based on teh global dictionary's numebr range per difficulty
+    a = randomint(difficulty) 
     b = randomint(difficulty)
-    operation = decideOp()
+    operation = decideOperation()
 
-    if operation == '+':
+    if operation == '+': #simple conditional to determine addition or subtraction
         correct_answer = a + b
     else:
         correct_answer = a - b
+
+    #sets the text in q_label to display the problem in this format
+    q_label.config(text=f"Question {state['index'] + 1} of {TOTAL_QUES}\n\n{a} {operation} {b} =")
+
+    attempt_label.config(text='First attempt = 10 points')
+    answer_entry.delete(0,tk.END) #clears entry box for player convenience
+
+    return correct_answer
+
+
+def isCorrect(user_answer, correct_answer, attempt, parent):
+    """checks player answer, then shows a message indicating if they were right or wrong"""
+    #this conditional checks if the user's answer is correct, checks if it was submitted first or second try,
+    #then prompts the appropriate amount of points
+    if user_answer == correct_answer:
+        points = FIRST_TRY if attempt == 1 else SECOND_TRY
+        messagebox.showinfo("Result", f"Correct! + {points} points", parent=parent)
+        return True #exits function immediately if answer is correct
+
+    #only reached if answer is wrong
+    #conditional checks if attempt is equal to 1, otherwise if the user misses their second chance, it prompts the appropriate message
+    if attempt == 1:
+        messagebox.showinfo("Result", "Wrong, one more try!", parent = parent)
+    else:
+        messagebox.showinfo("Result", f"Wrong! The answer was: {correct_answer}", parent=parent)
+
+    return False
+
+
+
+def get_rank(score):
+    """converts the points into a letter rating"""
+    #basic conditional statements covering the entry point of each rank
+    if score >= 70:
+        return "A"
+    elif score >= 60:
+        return "B"
+    elif score >= 50:
+        return "C"
+    elif score >= 40:
+        return "D"
+    else:
+        return "F"
+
+def displayResults(score, win):
+    """displays user total score and rank, it also prompts the user if they want to play again"""
+    #gathers the highest possible score
+    peak_score = TOTAL_QUES * FIRST_TRY
+    #displays user's score out of highest, their letter rank (which is gathered from get_rank function)
+    messagebox.showinfo("Finished", f"Final score: {score}/{peak_score}\nRank: {get_rank(score)}", parent = win)
+
+    win.destroy()
+
+    #conditional that prompts if the user wants to play again
+    if messagebox.askyesno("Play again?", "play the quiz again?"):
+        displayMenu()
+    else:
+        win.destroy()
+
+#quiz window (seperate)
 
 def open_questions(difficulty):
     """opens seperate window for the difficulty player chooses"""
@@ -94,50 +156,58 @@ def open_questions(difficulty):
     win.transient(main) #prioritises this window over the main menu screen
     win.grab_set() #blocks any interaction with the main window until the questions are either completed or closed
 
-    questions = QUESTIONS[difficulty] 
-    state = {"index": 0, "score": 0} #tracks player's progress in teh quiz - index holds the position of teh current question the player is in, score is how many answers the player got right
+    state = {"index": 0, "score": 0, "attempt": 1, "answer": None} #tracks player's progress in teh quiz - index holds the position of teh current question the player is in, score is how many answers the player got right
 
 
-    q_label = tk.Label(win, text="", font=("Arial", 14), wraplength=300) #this label is in place to display the questions
+    q_label = tk.Label(win, text="", font=("Robotica", 14), wraplength=300) #this label is in place to display the questions
     q_label.pack(pady=15)
+
+    #attempts
+    a_label = tk.Label(win, text="", font=("Robotica", 14))
+    a_label.pack(pady=3)
 
     #input widgets
     answer_entry = tk.Entry(win) 
-    answer_entry.pack()
-
-    def show_question():
-        """this function enables the questions from the global dictionary to be directly called"""
-        q_label.config(text=questions[state["index"]]["Q"]) #this configures the label from the parent function to display the current question
-        answer_entry.delete(0, tk.END) #this deletes the text inside the entry box automotically after every question answered, its for the player's convenience
+    answer_entry.pack(pady=5)
 
     def submit():
-        """this function runs everytime the submit button is interacted with"""
-        correct = questions[state["index"]]["A"].lower() #assigns the dataframe onto a variable for this function - .lower() is just to keep it in lowercase
-        if answer_entry.get().strip().lower() == correct: #this statement checks if the inputted answer is correct
-            state['score'] +=1 #adds point if the condition is achieved
-            messagebox.showinfo("Result", "Correct")
+        try:
+            user_answer = int(answer_entry.get().strip())
+        except ValueError:
+            messagebox.showwarning("Invalid input", "Enter a whole number", parent=win)
 
+        #conditional determining the answer's state(whether 1st or 2nd try) and assigns appropriate points
+        if isCorrect(user_answer, state["answer"], state["attempt"], win):
+            #10 points on first attempt, 5 points on second onto the state of 'score'
+            state['score'] += FIRST_TRY if state['attempt'] == 1 else SECOND_TRY 
+            next_question()
+        elif state['attempt'] == 1:
+            #wrong on first try - changes state of attempts from 1 to 2 and displays appropriate message
+            state["attempt"] = 2
+            a_label.config(text="2nd Attempt - 5 pts")
+            answer_entry.delete(0,tk.END)
+        #moves on to next question if second try is wrong
         else:
-            messagebox.showinfo("Result", f"Wrong, the answer was: {correct}")
+            next_question()
 
-        #these conditions check when to end 
-        state['index'] +=1 #this adds an extra 1 in the index so it doesnt start at 0
-        print("index:", state['index'], "total:", len(questions))
-        if state['index'] < len(questions): #this checks if there are more questions (IF index pos is less than the amount of questions, then show_question() is activated)
-            show_question()
+    def next_question():
+        """moves to next problem, or ends quiz if the final question is reached"""
+        state['index'] += 1 #adds 1 so index doesnt start at 0
+        state["attempt"] = 1 #constantly sets every question attempt state to 1
+        #if teh question number is below 10(max), displayProblem is called which continues to generate a new problem
+        if state['index'] < TOTAL_QUES:
+            state['answer'] = displayProblem(q_label, answer_entry, a_label, state, difficulty)
+        #if index is more than max question, displayResults is called, displaying score state and seperate window
         else:
-            messagebox.showinfo(
-                "Done!", f"Score: {state['score']}/{len(questions)}" )
-            win.destroy()
+            displayResults(state['score'], win)
 
     tk.Button(win, text='Submit', command=submit).pack(pady="10")
-    show_question()
+
+    #first problem
+    state['answer'] = displayProblem(q_label, answer_entry, a_label, state, difficulty)
 
 
 
-
-
-
-
-
+#startup
+displayMenu()
 main.mainloop()
