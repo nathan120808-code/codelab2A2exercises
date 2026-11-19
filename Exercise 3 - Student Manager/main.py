@@ -17,7 +17,7 @@ FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "studentMarks.tx
 
 #file handler
 def load():
-    """reads txt file and loads liens into dictionaries"""
+    """reads txt file and loads lines into dictionaries"""
     students =[]
     if not os.path.exists(FILE):
         return students
@@ -25,12 +25,12 @@ def load():
         lines = f.read().splitlines()[1:] #skip line 1
     for line in lines:
         if line.strip():
-            p = line.split(",")
+            p = line.split(",") #p = [id,name,mark1,mark2,mark3,mark4]
             #splits the data seperately into their corresponding class
-            students.append({"number": int(p[0]),
-                            "name": p[1],
-                            "marks": [int(m) for m in p[2:5]],
-                            "exam": int(p[5])})
+            students.append({"number": int(p[0]), #appends index 0 which is student id
+                            "name": p[1], #appends name
+                            "marks": [int(m) for m in p[2:5]], #appends index 2-5 which are course marks
+                            "exam": int(p[5])}) #appends exam marks
 
     return students
 
@@ -39,6 +39,7 @@ def save():
     with open(FILE, "w") as f:
         f.write(f"{len(students)}\n")
         for s in students:
+            #flat str list joined with commas
             parts = [str(s["number"]), s["name"]] + [str(m) for m in s["marks"]] + [str(s["exam"])]
             f.write(",".join(parts) + "\n")
 
@@ -46,11 +47,11 @@ def save():
 #functions for calculating
 def course_total(s):
     """returns total coursework marks"""
-    return sum(s["marks"]) #gathers student marks
+    return sum(s["marks"])
 
 def score_total(s):
     """returns coursework + exam marks"""
-    return course_total(s) + s['exam']
+    return course_total(s) + s['exam'] 
 
 def percentage(s):
     """overall score based on 160 total marks"""
@@ -126,6 +127,7 @@ def ask_details(old=None):
     return {"number": number, "name": name.replace(',', ""), "marks": marks, "exam": exam}
 
 def number_take(number, ignore=None):
+    #first compares value of dict with inputted number, and then ensures te exact item is not a duplicate, then iterates through the dict students
     return any(s['number'] == number and s is not ignore for s in students)
 
 #functionality options
@@ -146,12 +148,12 @@ def view_single():
 def show_high():
     """shows student with the highest score through min max values"""
     if has_students():
-        show_student([max(students, key=score_total)])
+        show_student([max(students, key=score_total)]) #checks for teh highest value with max in the students dict based on the key
 
 def show_high():
     """same with show_high but provides lowest ranking student"""
     if has_students():
-            show_student([min(students, key=score_total)])
+            show_student([min(students, key=score_total)])  #checks for teh lowest value with max in the students dict based on the key
 
 def sort_records():
     """sorts by overall score - this will use sorted() which makes a new ordered list to be displayed without changing the data frame"""
@@ -160,7 +162,32 @@ def sort_records():
                                         "Yes = Ascending\n No = Descending")
         show_student(sorted(students, key=percentage, reverse=not ascending))
 
+def add_student():
+    """asks for new student details"""
+    new = ask_details()
+    #
+    if new and number_take(new['number']):
+        messagebox.showerror("Error", "Student number already exists")
+    #else appends new students and activates the necessary functions for it be saved onto the data frame - also fully displays all the details after
+    else:
+        students.append(new)
+        save()
+        view_all()
 
+def update_student():
+    """finds a student, confirms teh details, then replaces the old student's data and is saved on the main file"""
+    s = find("Enter the number or name of student")
+
+    if s:
+        new = ask_details(s)
+        #handles duplicate values
+        if new and number_take(new["number"], ignore=s):
+            messagebox.showerror("Error", "Student number already exists")
+        
+        elif new:
+            s.update(new) #overwrites the dictionary value in place
+            save()
+            view_all()
 
 #FRONTEND
 
