@@ -39,46 +39,54 @@ def save():
     with open(FILE, "w") as f:
         f.write(f"{len(students)}\n")
         for s in students:
-            parts = [str(s["number"]),
-                      s["name"] + [str(m) for m in s["marks"]] + [str(s["exam"])]]
+            parts = [str(s["number"]), s["name"]] + [str(m) for m in s["marks"]] + [str(s["exam"])]
             f.write(",".join(parts) + "\n")
 
 
 #functions for calculating
 def course_total(s):
     """returns total coursework marks"""
-    return sum(s["marks"]) + s["exam"] #gathers student marks and exam marks and are added together
+    return sum(s["marks"]) #gathers student marks
 
 def score_total(s):
-    """returns total of exam + course marks"""
-    return course_total(s) / TOTAL_MARK * 100
+    """returns coursework + exam marks"""
+    return course_total(s) + s['exam']
+
+def percentage(s):
+    """overall score based on 160 total marks"""
+    return score_total(s) / TOTAL_MARK * 100
 
 def grade_total(s):
     """provides ranking based total"""
-    st = score_total(s)
+    p = percentage(s)
     #basic conditionals covering the margin for each rank
-    if st >= 70:
+    if p >= 70:
         return "A"
-    if st >= 60:
+    if p >= 60:
         return "B"
-    if st >= 50:
+    if p >= 50:
         return "C"
-    if st >= 40:
+    if p >= 40:
         return "D"
     return "F"
 
 #backend functionality
-def show_student(records, summar=''):
+def show_student(records, summary=''):
     """every menu item prints through here with the same format - displaying all relevant student details"""
     output.delete("1.0", tk.END)
     for s in records:
         output.insert(tk.END, f"{s['name']} ({s['number']}) Coursework: {sum(s['marks'])}/60"
                       f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f}% Grade: {grade_total(s)}\n")
 
+    if summary:
+        output.insert(tk.END, "\n" + summary)
+
 def has_students():
     """"""
     if not students:
         messagebox.showinfo("No data", "Please check if student records is in the local folder")
+        return False
+    return True
 
 def find(prompt):
     """a search prompt which asks fro student number or name optionally"""
@@ -99,7 +107,7 @@ def ask_details(old=None):
     old = old or {"number": None, "name": "", "marks": [None] * 3, "exam": None}
     number = simpledialog.askinteger("Student", "Student number (1000 - 9999):",
                                      initialvalue=old["number"], minvalue=1000, maxvalue=9999)
-    name = simpledialog.askstring("Student", "Student Name:" initialvalue=old["name"]) if number else None
+    name = simpledialog.askstring("Student", "Student Name:", initialvalue=old["name"]) if number else None
     if not name:
         return None
     marks = []
@@ -117,6 +125,43 @@ def ask_details(old=None):
         return None
     return {"number": number, "name": name.replace(',', ""), "marks": marks, "exam": exam}
 
+def number_take(number, ignore=None):
+    return any(s['number'] == number and s is not ignore for s in students)
+
+#functionality options
+def view_all():
+    if students:
+        average = sum(percentage(s) for s in students) / len (students)
+        show_student(students, f"Students in class: {len(students)}\n"
+                     f"Average: {average:.1f}%")
+    else:
+        show_student([], "No available records")
+
+def view_single():
+    """locates student thorugh id or name with show_students() function"""
+    s = find("Enter Student ID or Name")
+    if s: 
+        show_student([s])
+
+def show_high():
+    """shows student with the highest score through min max values"""
+    if has_students():
+        show_student([max(students, key=score_total)])
+
+def show_high():
+    """same with show_high but provides lowest ranking student"""
+    if has_students():
+            show_student([min(students, key=score_total)])
+
+def sort_records():
+    """sorts by overall score - this will use sorted() which makes a new ordered list to be displayed without changing the data frame"""
+    if has_students():
+        ascending = messagebox.askyesno("Sort by overall grade",
+                                        "Yes = Ascending\n No = Descending")
+        show_student(sorted(students, key=percentage, reverse=not ascending))
+
+
+
 #FRONTEND
 
 main = tk.Tk()
@@ -128,4 +173,8 @@ main.config(
 )
 
 title_label = tk.Label(main, text="Student Manager")
+
+
+students = load()
+main.mainloop()
 
