@@ -17,7 +17,7 @@ FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "studentMarks.tx
 
 #file handler
 def load():
-    """reads txt file and loads lines into dictionaries"""
+    """reads txt file and loads lines into student dictionary"""
     students =[]
     if not os.path.exists(FILE):
         return students
@@ -74,31 +74,31 @@ def grade_total(s):
 #backend functionality
 def show_student(records, summary=''):
     """every menu item prints through here with the same format - displaying all relevant student details"""
-    output.delete("1.0", tk.END)
-    for s in records:
+    output.delete("1.0", tk.END) #clear whatever shows in the output text label
+    for s in records: #records are the list of students to be displayed
         output.insert(tk.END, f"{s['name']} ({s['number']}) Coursework: {sum(s['marks'])}/60"
-                      f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f}% Grade: {grade_total(s)}\n")
+                      f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f}% Grade: {grade_total(s)}\n") #inserts this text into the output text label
 
-    if summary:
+    if summary: #optional text shwon under the list like class size or average
         output.insert(tk.END, "\n" + summary)
 
 def has_students():
-    """"""
-    if not students:
+    """returns true if records (the txt file) is loaded by the load() function."""
+    if not students: #if statement fires when students is empty - specifically the return false
         messagebox.showinfo("No data", "Please check if student records is in the local folder")
         return False
-    return True
+    return True #returns true after if statement happens(if the student marks file is available)
 
 def find(prompt):
     """a search prompt which asks fro student number or name optionally"""
-    if not has_students():
+    if not has_students(): #if has_students returns false - nothing will be available to search
         return None
-    query = simpledialog.askstring("Search student", prompt)
-    if query:
-        for s in students:
-            if query.strip().lower() in (str(s["number"]), s["name"].lower()):
+    query = simpledialog.askstring("Search student", prompt) #simple dialog using askstring
+    if query: 
+        for s in students: #for every student in students - the if statement below fires
+            if query.strip().lower() in (str(s["number"]), s["name"].lower()): #if query is in dictionary it returns student details
                 return s
-        messagebox.showinfo("Not found", f"No student matches {query}")
+        messagebox.showinfo("Not found", f"No student matches {query}") #if student is not recognized, messagebox loads this text
 
     return None
 
