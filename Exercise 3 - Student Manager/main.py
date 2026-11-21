@@ -150,7 +150,7 @@ def show_high():
     if has_students():
         show_student([max(students, key=score_total)]) #checks for teh highest value with max in the students dict based on the key
 
-def show_high():
+def show_low():
     """same with show_high but provides lowest ranking student"""
     if has_students():
             show_student([min(students, key=score_total)])  #checks for teh lowest value with max in the students dict based on the key
@@ -174,6 +174,15 @@ def add_student():
         save()
         view_all()
 
+def del_student():
+    """deletes student details"""
+    delete = find("Enter student name or ID to delete.")
+    if delete and messagebox.askyesno("Confirm", f"Delete {delete['name']}?"):
+        students.remove(delete)
+        save()
+        view_all()
+
+
 def update_student():
     """finds a student, confirms teh details, then replaces the old student's data and is saved on the main file"""
     s = find("Enter the number or name of student")
@@ -193,11 +202,24 @@ def update_student():
 
 main = tk.Tk()
 main.title("Student Manager")
-main.geometry("800x500")
+main.geometry("900x500")
 main.resizable(0,0)
 main.config(
     bg = "#323B4E"
 )
+
+#customization variables
+ui_font = ("Helvetica", 11)
+
+menu = [("1. View all student records", view_all),
+        ("2. View Individual records", view_single),
+        ("3. Show student with highest total marks", show_high),
+        ("4. Show student with lowest total marks", show_low),
+        ("5. Sort student records", sort_records),
+        ("6. Add new student details", add_student),
+        ("7. Delete existing student details", del_student),
+        ("8. Upate existing student details", update_student)]
+
 
 title_label = tk.Label(main, text="Student Manager")
 
