@@ -202,7 +202,7 @@ def update_student():
 
 main = tk.Tk()
 main.title("Student Manager")
-main.geometry("900x500")
+main.geometry("980x560")
 main.resizable(0,0)
 main.config(
     bg = "#323B4E"
@@ -219,11 +219,18 @@ menu = [("1. View all student records", view_all),
         ("6. Add new student details", add_student),
         ("7. Delete existing student details", del_student),
         ("8. Upate existing student details", update_student)]
+for text, command in menu:
+    tk.Button(main, text=text, command=command, width= 70).pack(padx = 10, pady= 3)
+
+output = tk.Text(main, width=100, height=18)
+output.pack(padx=10,pady=10)
+
 
 
 title_label = tk.Label(main, text="Student Manager")
 
 
-students = load()
+students = load() #this is necessary in order for certain functions to access the dictionary
+view_all() #shows all student details on launch
 main.mainloop()
 
