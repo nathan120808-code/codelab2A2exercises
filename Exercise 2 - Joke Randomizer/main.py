@@ -64,33 +64,35 @@ def quit_app():
 title1 = tk.Label(main, text="Joke Generator",font=('Robotica', 25), fg= "#ffffff", bg= "#1A2A3A")
 title1.pack(pady=25)
 
-#joke button
-alexa_b = tk.Button(main, text="Alexa tell me a joke", font=('Robotica', 16), command=joke_new)
-alexa_b.pack(pady=10)
 
 
 #JOKE DISPLAY
 #joke setup
-question_label1 = tk.Label(main, text="",font=('Robotica', 18), fg= "#ffffff", bg= "#1A2A3A", wraplength=700,justify="center")
-question_label1.pack(pady=(20,10))
+joke_set = tk.Frame(main, bg= "#3E4349")
+joke_set.pack(side="right",fill="both", expand=True)
+question_label1 = tk.Label(joke_set, text="",font=('Robotica', 18), fg= "#ffffff", bg= "#3E4349", wraplength=370,justify="center")
+question_label1.pack(pady=10, fill="x",expand=False)
 
 #joke punchline
-question_label2 = tk.Label(main, text="",font=('Robotica', 18,'italic'), fg= "#ffffff", bg= "#1A2A3A", wraplength=700, justify='center')
-question_label2.pack(pady=10)
+question_label2 = tk.Label(joke_set, text="",font=('Robotica', 18,'italic'), fg= "#ffffff", bg= "#3E4349", wraplength=370, justify='center')
+question_label2.pack(pady=10,fill="x",expand=False)
 
 #ROW AND BUTTONS
-button_row = tk.Frame(main, bg='#1A2A3A')
-button_row.pack(pady=25)
+button_sidebar = tk.Frame(main, bg='#1A2A3A')
+button_sidebar.pack(side="left", fill="y")
 
 #punchline
-gen_button1= tk.Button(button_row, text="Show Punchline", font=('Robotica', 15), width = 14, state="disabled", command=show_punchline)
-gen_button1.grid(row=0,column=0,padx=8)
+#joke button
+alexa_b = tk.Button(button_sidebar, text="Alexa tell me a joke", font=('Robotica', 15), width= 20,command=joke_new)
+alexa_b.grid(row=0, column=0,pady=2,sticky="n")
+gen_button1= tk.Button(button_sidebar, text="Show Punchline", font=('Robotica', 15), width = 20, state="disabled", command=show_punchline)
+gen_button1.grid(row=1,column=0,pady=2)
 #next button
-gen_button2 = tk.Button(button_row, text="Next Joke", font=('Robotica', 15), width = 14, state="disabled", command=joke_new)
-gen_button2.grid(row=0,column=1,padx=8)
+gen_button2 = tk.Button(button_sidebar, text="Next Joke", font=('Robotica', 15), width = 20, state="disabled", command=joke_new)
+gen_button2.grid(row=2,column=0,pady=2)
 #quit button
-gen_button3 = tk.Button(button_row, text="Quit", font=('Robotica', 15), width = 14, command=quit_app)
-gen_button3.grid(row=0,column=2,padx=8)
+gen_button3 = tk.Button(button_sidebar, text="Quit", font=('Robotica', 15), width = 20, command=quit_app)
+gen_button3.grid(row=3,column=0,pady=2)
 
 if not JOKES: #IF the jokes txt file is not available locally - this statement will activate, disabling teh joke button and displaying the unavail text
     alexa_b.config(state="disabled")

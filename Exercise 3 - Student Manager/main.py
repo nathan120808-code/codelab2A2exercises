@@ -202,27 +202,52 @@ def update_student():
 
 main = tk.Tk()
 main.title("Student Manager")
-main.geometry("980x560")
+main.geometry("1200x680")
 main.resizable(0,0)
 main.config(
     bg = "#323B4E"
 )
 
 #customization variables
-ui_font = ("Helvetica", 11)
+title_font = ("Helvetica", 25)
+text_font = ("Helvetica", 19)
+text2_font=("Helvetica", 15)
+button_font = ("Robotica", 15)
 
-menu = [("1. View all student records", view_all),
-        ("2. View Individual records", view_single),
-        ("3. Show student with highest total marks", show_high),
-        ("4. Show student with lowest total marks", show_low),
-        ("5. Sort student records", sort_records),
-        ("6. Add new student details", add_student),
-        ("7. Delete existing student details", del_student),
-        ("8. Upate existing student details", update_student)]
-for text, command in menu:
-    tk.Button(main, text=text, command=command, width= 70).pack(padx = 10, pady= 3)
+title_frame = tk.Frame(main, bg="#323B4E")
+title_frame.pack(side="top", fill="x")
 
-output = tk.Text(main, width=100, height=18)
+title_label = tk.Label(title_frame, text="Student Manager", font=title_font)
+title_label.pack(anchor="w",padx=15,pady=(17,17))
+
+menu_frame = tk.Frame(main, bg="#3F4C68")
+menu_frame.pack(side='left', fill="y")
+
+
+menu1_label = tk.Label(menu_frame, text= "Viewer", wraplength=300, font=text_font, bg="#3F4C68", fg="#CFCFCF")
+menu1_label.pack(anchor="w",padx=15,pady=(17,17))
+
+menu1 = [("View all student records", view_all),
+        ("View Individual records", view_single),
+        ("Show student with highest total marks", show_high),
+        ("Show student with lowest total marks", show_low),
+        ("Sort student records", sort_records)
+]
+for text, command in menu1:
+    tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
+
+menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text_font, bg="#3F4C68", fg="#CFCFCF")
+menu2_label.pack(anchor="w",padx=15,pady=(17,17))
+
+menu2 = [
+        ("Add new student details", add_student),
+        ("Delete existing student details", del_student),
+        ("Upate existing student details", update_student)
+        ]
+for text, command in menu2:
+    tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
+
+output = tk.Text(main,spacing3=15, width=100, height=40, font=text2_font, bg="#F7F7F7")
 output.pack(padx=10,pady=10)
 
 
