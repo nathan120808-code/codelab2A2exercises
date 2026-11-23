@@ -211,20 +211,20 @@ main.config(
 #customization variables
 title_font = ("Helvetica", 25)
 text_font = ("Helvetica", 19)
-text2_font=("Helvetica", 15)
+text2_font=("Helvetica", 14)
 button_font = ("Robotica", 15)
 
 title_frame = tk.Frame(main, bg="#323B4E")
 title_frame.pack(side="top", fill="x")
 
-title_label = tk.Label(title_frame, text="Student Manager", font=title_font)
+title_label = tk.Label(title_frame, text="Student Manager", font=title_font,bg="#323B4E",fg="#FFFFFF")
 title_label.pack(anchor="w",padx=15,pady=(17,17))
 
 menu_frame = tk.Frame(main, bg="#3F4C68")
 menu_frame.pack(side='left', fill="y")
 
 
-menu1_label = tk.Label(menu_frame, text= "Viewer", wraplength=300, font=text_font, bg="#3F4C68", fg="#CFCFCF")
+menu1_label = tk.Label(menu_frame, text= "Viewer", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF")
 menu1_label.pack(anchor="w",padx=15,pady=(17,17))
 
 menu1 = [("View all student records", view_all),
@@ -236,7 +236,7 @@ menu1 = [("View all student records", view_all),
 for text, command in menu1:
     tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
 
-menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text_font, bg="#3F4C68", fg="#CFCFCF")
+menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF")
 menu2_label.pack(anchor="w",padx=15,pady=(17,17))
 
 menu2 = [
