@@ -47,15 +47,15 @@ def save():
 #functions for calculating
 def course_total(s):
     """returns total coursework marks"""
-    return sum(s["marks"])
+    return sum(s["marks"]) #returns total course marks
 
 def score_total(s):
     """returns coursework + exam marks"""
-    return course_total(s) + s['exam'] 
+    return course_total(s) + s['exam']  #all 3 course marks plus exam
 
 def percentage(s):
     """overall score based on 160 total marks"""
-    return score_total(s) / TOTAL_MARK * 100
+    return score_total(s) / TOTAL_MARK * 100 #total score divided by total mark times 100 to get overall
 
 def grade_total(s):
     """provides ranking based total"""
@@ -75,9 +75,10 @@ def grade_total(s):
 def show_student(records, summary=''):
     """every menu item prints through here with the same format - displaying all relevant student details"""
     output.delete("1.0", tk.END) #clear whatever shows in the output text label
+
     for s in records: #records are the list of students to be displayed
         output.insert(tk.END, f"{s['name']} ({s['number']}) Coursework: {sum(s['marks'])}/60"
-                      f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f}% Grade: {grade_total(s)}\n") #inserts this text into the output text label
+                      f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f} Grade: {grade_total(s)}\n") #inserts this text into the output text label
 
     if summary: #optional text shwon under the list like class size or average
         output.insert(tk.END, "\n" + summary)
@@ -107,20 +108,20 @@ def ask_details(old=None):
     box starts filled with the current value"""
     old = old or {"number": None, "name": "", "marks": [None] * 3, "exam": None}
     number = simpledialog.askinteger("Student", "Student number (1000 - 9999):",
-                                     initialvalue=old["number"], minvalue=1000, maxvalue=9999)
-    name = simpledialog.askstring("Student", "Student Name:", initialvalue=old["name"]) if number else None
-    if not name:
+                                     initialvalue=old["number"], minvalue=1000, maxvalue=9999) #sets min max of ID num values
+    name = simpledialog.askstring("Student", "Student Name:", initialvalue=old["name"]) if number else None #checks if variable is true, None is assigned if falsy
+    if not name: #if input is empty
         return None
     marks = []
     for i in range(3):
-        m = simpledialog.askinteger("Student",f'Course mark {i + 1} {0-20}:',
+        m = simpledialog.askinteger("Student",f'Course mark {i + 1} {0-20}:', #prompts 3 times to aks each course mark out of 20
                                     initialvalue=old["marks"][i], minvalue=0, maxvalue=20)
-        if m is None:
+        if m is None: #if input is empty
             return None
         marks.append(m)
 
     exam = simpledialog.askinteger("Student", "Exam mark (0-100)",
-                                   initialvalue=old['exam'], minvalue=0, maxvalue=100)
+                                   initialvalue=old['exam'], minvalue=0, maxvalue=100) #prompts user for student exam marks
 
     if exam is None:
         return None
@@ -143,7 +144,7 @@ def view_single():
     """locates student thorugh id or name with show_students() function"""
     s = find("Enter Student ID or Name")
     if s: 
-        show_student([s])
+        show_student([s]) #shows individual line
 
 def show_high():
     """shows student with the highest score through min max values"""
@@ -159,28 +160,28 @@ def sort_records():
     """sorts by overall score - this will use sorted() which makes a new ordered list to be displayed without changing the data frame"""
     if has_students():
         ascending = messagebox.askyesno("Sort by overall grade",
-                                        "Yes = Ascending\n No = Descending")
+                                        "Yes = Ascending\n No = Descending") #prompts the user yes or no for asc or desc
         show_student(sorted(students, key=percentage, reverse=not ascending))
 
 def add_student():
     """asks for new student details"""
-    new = ask_details()
+    new = ask_details() #new calls on the ask_details function
     #
-    if new and number_take(new['number']):
+    if new and number_take(new['number']): #conditional for when the inputted number exists to prevent duplicate
         messagebox.showerror("Error", "Student number already exists")
     #else appends new students and activates the necessary functions for it be saved onto the data frame - also fully displays all the details after
     else:
-        students.append(new)
-        save()
-        view_all()
+        students.append(new) #appends the new student detail
+        save() #calls save function to save changes
+        view_all() #calls view_all to show updated list
 
 def del_student():
     """deletes student details"""
     delete = find("Enter student name or ID to delete.")
-    if delete and messagebox.askyesno("Confirm", f"Delete {delete['name']}?"):
-        students.remove(delete)
+    if delete and messagebox.askyesno("Confirm", f"Delete {delete['name']}?"): #prompts the user window to confirm delete
+        students.remove(delete) #deletes student based of what the user inputs
         save()
-        view_all()
+        view_all() 
 
 
 def update_student():
@@ -200,6 +201,7 @@ def update_student():
 
 #FRONTEND
 
+#template
 main = tk.Tk()
 main.title("Student Manager")
 main.geometry("1200x680")
@@ -214,6 +216,7 @@ text_font = ("Helvetica", 19)
 text2_font=("Helvetica", 14)
 button_font = ("Robotica", 15)
 
+#essentials
 title_frame = tk.Frame(main, bg="#323B4E")
 title_frame.pack(side="top", fill="x")
 
@@ -226,7 +229,7 @@ menu_frame.pack(side='left', fill="y")
 
 menu1_label = tk.Label(menu_frame, text= "Viewer", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF")
 menu1_label.pack(anchor="w",padx=15,pady=(17,17))
-
+#menu for viewer
 menu1 = [("View all student records", view_all),
         ("View Individual records", view_single),
         ("Show student with highest total marks", show_high),
@@ -236,23 +239,21 @@ menu1 = [("View all student records", view_all),
 for text, command in menu1:
     tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
 
-menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF")
+menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF") #sets all attrb for menu1
 menu2_label.pack(anchor="w",padx=15,pady=(17,17))
-
+#menu for editor
 menu2 = [
         ("Add new student details", add_student),
         ("Delete existing student details", del_student),
         ("Upate existing student details", update_student)
         ]
 for text, command in menu2:
-    tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
+    tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3) #sets all attrb for menu2
 
+#the output screen which the functions access
 output = tk.Text(main,spacing3=15, width=100, height=40, font=text2_font, bg="#F7F7F7")
 output.pack(padx=10,pady=10)
 
-
-
-title_label = tk.Label(main, text="Student Manager")
 
 
 students = load() #this is necessary in order for certain functions to access the dictionary
