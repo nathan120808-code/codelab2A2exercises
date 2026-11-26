@@ -11,7 +11,7 @@ except AttributeError:
     pass  # Skips safely if running on macOS or Linux
 
 #globals
-TOTAL_MARK = 160 #out of 160
+TOTAL_MARK = 160 #the highest possible marks
 
 #data line layout for notes
 #2345,Sam Sturtivant,14,15,14,77
@@ -268,8 +268,13 @@ for text, command in menu2:
     tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3) #sets all attrb for menu2
 
 #the output screen which the functions access
-output = tk.Text(main,spacing3=15, width=100, height=40, font=text2_font, bg="#F7F7F7")
-output.pack(padx=10,pady=10)
+out_frame = tk.Frame(main, bg = "#3F525F")
+
+scroll = tk.Scrollbar(out_frame)
+scroll.pack(side="right", fill="y")
+
+output = tk.Text(main,spacing3=40, width=70, height=40, font=text2_font, bg="#F7F7F7", yscrollcommand=scroll.set)
+output.pack(side="left", fill="y", expand=True)
 
 
 
