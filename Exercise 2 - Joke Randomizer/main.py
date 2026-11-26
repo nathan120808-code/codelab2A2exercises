@@ -1,6 +1,15 @@
 import tkinter as tk
 import os
 import random
+from PIL import Image, ImageTk
+import ctypes
+
+#this was implemented with Gemini, this try except block is to ensure it doesnt load the python icon
+try:
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("my.unique.app.id")
+#fires if user is on mac or linux
+except AttributeError:
+    pass  # Skips safely if running on macOS or Linux
 
 main = tk.Tk()
 main.title("Joke Generator")
@@ -9,6 +18,11 @@ main.resizable(0,0)
 main.config(
     bg="#1A2A3A"
 )
+
+#icons
+img = Image.open("N-Photoroom - Copy.ico")
+
+main.iconbitmap("N-Photoroom - Copy.ico")
 
 #GLOBAL dataset (this was figured using gemini)
 JOKE_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "randomJokes.txt")

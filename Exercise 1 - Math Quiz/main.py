@@ -1,7 +1,16 @@
 #library imports
+import ctypes
 import random
 import tkinter as tk
 from tkinter import messagebox
+from PIL import Image, ImageTk
+
+#this was implemented with Gemini, this try except block is to ensure it doesnt load the python icon
+try:
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("my.unique.app.id")
+#fires if user is on mac or linux
+except AttributeError:
+    pass  # Skips safely if running on macOS or Linux
 
 #essentials
 main = tk.Tk()
@@ -11,6 +20,11 @@ main.resizable(0,0)
 main.configure(
     bg='black'
 )
+
+#icons
+img = Image.open("N-Photoroom - Copy.ico")
+
+main.iconbitmap("N-Photoroom - Copy.ico")
 
 # global variables for customization
 title_font = ('Helvetica', 40, 'bold')

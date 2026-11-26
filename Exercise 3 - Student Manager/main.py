@@ -1,6 +1,14 @@
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
+import ctypes
+from PIL import Image, ImageTk
+#this was implemented with Gemini, this try except block is to ensure it doesnt load the python icon
+try:
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("my.unique.app.id")
+#fires if user is on mac or linux
+except AttributeError:
+    pass  # Skips safely if running on macOS or Linux
 
 #globals
 TOTAL_MARK = 160 #out of 160
@@ -26,7 +34,7 @@ def load():
     for line in lines:
         if line.strip():
             p = line.split(",") #p = [id,name,mark1,mark2,mark3,mark4]
-            #splits the data seperately into their corresponding class
+            #splits the data seperately into their corresponding class (NOTE: structuring this append was done with claude)
             students.append({"number": int(p[0]), #appends index 0 which is student id
                             "name": p[1], #appends name
                             "marks": [int(m) for m in p[2:5]], #appends index 2-5 which are course marks
@@ -77,6 +85,7 @@ def show_student(records, summary=''):
     output.delete("1.0", tk.END) #clear whatever shows in the output text label
 
     for s in records: #records are the list of students to be displayed
+        #this text is whats inserted into output to be displayed
         output.insert(tk.END, f"{s['name']} ({s['number']}) Coursework: {sum(s['marks'])}/60"
                       f"Exam: {s['exam']}/100 Overall: {score_total(s):.1f} Grade: {grade_total(s)}\n") #inserts this text into the output text label
 
@@ -107,6 +116,7 @@ def ask_details(old=None):
     """asks for each class in turn - askinteger checks the ranges for us. If old is given (updating), each
     box starts filled with the current value"""
     old = old or {"number": None, "name": "", "marks": [None] * 3, "exam": None}
+    #all simple dialogs are seperate windows taht prompt the user, they also include necessary settings for each
     number = simpledialog.askinteger("Student", "Student number (1000 - 9999):",
                                      initialvalue=old["number"], minvalue=1000, maxvalue=9999) #sets min max of ID num values
     name = simpledialog.askstring("Student", "Student Name:", initialvalue=old["name"]) if number else None #checks if variable is true, None is assigned if falsy
@@ -134,15 +144,16 @@ def number_take(number, ignore=None):
 #functionality options
 def view_all():
     if students:
-        average = sum(percentage(s) for s in students) / len (students)
-        show_student(students, f"Students in class: {len(students)}\n"
-                     f"Average: {average:.1f}%")
+        average = sum(percentage(s) for s in students) / len (students) #collects average of entire class
+        show_student(students, f"Students in class: {len(students)}\n" 
+                     f"Average: {average:.1f}%") #calls shows student and displays teh necessary data
+    #only if students is empty
     else:
         show_student([], "No available records")
 
 def view_single():
     """locates student thorugh id or name with show_students() function"""
-    s = find("Enter Student ID or Name")
+    s = find("Enter Student ID or Name") #prompts user
     if s: 
         show_student([s]) #shows individual line
 
@@ -210,6 +221,11 @@ main.config(
     bg = "#323B4E"
 )
 
+#icons
+img = Image.open("N-Photoroom - Copy.ico")
+
+main.iconbitmap("N-Photoroom - Copy.ico")
+
 #customization variables
 title_font = ("Helvetica", 25)
 text_font = ("Helvetica", 19)
@@ -227,6 +243,7 @@ menu_frame = tk.Frame(main, bg="#3F4C68")
 menu_frame.pack(side='left', fill="y")
 
 
+
 menu1_label = tk.Label(menu_frame, text= "Viewer", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF")
 menu1_label.pack(anchor="w",padx=15,pady=(17,17))
 #menu for viewer
@@ -240,7 +257,7 @@ for text, command in menu1:
     tk.Button(menu_frame, text=text, command=command, width= 30, font=button_font).pack(padx = 10, pady= 3)
 
 menu2_label = tk.Label(menu_frame, text= "Editor", wraplength=300, font=text2_font, bg="#3F4C68", fg="#CFCFCF") #sets all attrb for menu1
-menu2_label.pack(anchor="w",padx=15,pady=(17,17))
+menu2_label.pack(anchor="w",padx=15,pady=(60,17))
 #menu for editor
 menu2 = [
         ("Add new student details", add_student),
