@@ -18,7 +18,7 @@ main.title("Math Game")
 main.geometry('800x500')
 main.resizable(0,0)
 main.configure(
-    bg='black'
+    bg="#36454e"
 )
 
 #icons
@@ -62,7 +62,7 @@ def displayMenu():
         widget.destroy()
 
     #title
-    title1 = tk.Label(main, text="Test your Math!",
+    title1 = tk.Label(main, text="Test your Math!", fg="#ffffff", bg="#36454e",
                 font = title_font
                 ).pack(pady= 30)
 
@@ -87,7 +87,7 @@ def displayMenu():
                 command=lambda: open_questions('advanced')).pack(pady= 10)
 
 
-def displayProblem(q_label, answer_entry, attempt_label, state, difficulty):
+def displayProblem(q_label, q_label2, answer_entry, a_label, state, difficulty):
     """creates random problems, is displayed and clears answer box. and returns the correct answer to the problem"""
 
     #a and b are assigned random numbers based on teh global dictionary's numebr range per difficulty
@@ -101,9 +101,10 @@ def displayProblem(q_label, answer_entry, attempt_label, state, difficulty):
         correct_answer = a - b
 
     #sets the text in q_label to display the problem in this format
-    q_label.config(text=f"Question {state['index'] + 1} of {TOTAL_QUES}\n\n{a} {operation} {b} =")
+    q_label.config(text=f"Question {state['index'] + 1} of {TOTAL_QUES}")
+    q_label2.config(text=f"{a} {operation} {b} =")
 
-    attempt_label.config(text='First attempt = 10 points')
+    a_label.config(text='First attempt = 10 points')
     answer_entry.delete(0,tk.END) #clears entry box for player convenience
 
     return correct_answer
@@ -165,24 +166,29 @@ def open_questions(difficulty):
     #window configs
     win = tk.Toplevel(main) #toplevel is a widget which creates a seperate pop up window
     win.title(f"{difficulty.capitalize()} Questions") #sets window title
-    win.geometry(('600x300')) #window dimensions
-    win.configure()
+    win.geometry(('600x320')) #window dimensions
+    win.configure(bg = "#2f373b")
     win.transient(main) #prioritises this window over the main menu screen
     win.grab_set() #blocks any interaction with the main window until the questions are either completed or closed
 
     state = {"index": 0, "score": 0, "attempt": 1, "answer": None} #tracks player's progress in teh quiz - index holds the position of teh current question the player is in, score is how many answers the player got right
 
 
-    q_label = tk.Label(win, text="", font=("Robotica", 14), wraplength=300) #this label is in place to display the questions
-    q_label.pack(pady=15)
+    q_label = tk.Label(win, text="",bg="#2f373b", fg="#b91717", font=("Robotica", 14), wraplength=300) #this label is in place to display the questions
+    q_label.pack(pady=(20,15))
 
+    problem_frame = tk.Frame(win)
+    problem_frame.pack(pady=15)
+
+    q_label2 = tk.Label(problem_frame, text="",bg="#2f373b", fg="#ffffff", font=("Arial", 20)) #the problem, e.g. 45 + 9 =
+    q_label2.pack(side=tk.LEFT, padx=(0, 10))
+
+    answer_entry = tk.Entry(problem_frame, width=10,bg="#2f373b", fg="#ffffff", font=("Arial", 20))
+    answer_entry.pack(side=tk.LEFT)
+    
     #attempts
-    a_label = tk.Label(win, text="", font=("Robotica", 14))
-    a_label.pack(pady=3)
-
-    #input widgets
-    answer_entry = tk.Entry(win) 
-    answer_entry.pack(pady=5)
+    a_label = tk.Label(win, text="",bg="#2f373b", fg="#ffffff", font=("Robotica", 14))
+    a_label.pack(pady=15)
 
     def submit():
         try:
@@ -210,7 +216,7 @@ def open_questions(difficulty):
         state["attempt"] = 1 #constantly sets every question attempt state to 1
         #if teh question number is below 10(max), displayProblem is called which continues to generate a new problem
         if state['index'] < TOTAL_QUES:
-            state['answer'] = displayProblem(q_label, answer_entry, a_label, state, difficulty)
+            state['answer'] = displayProblem(q_label,q_label2, answer_entry, a_label, state, difficulty)
         #if index is more than max question, displayResults is called, displaying score state and seperate window
         else:
             displayResults(state['score'], win)
@@ -218,7 +224,7 @@ def open_questions(difficulty):
     tk.Button(win, text='Submit', command=submit).pack(pady="10")
 
     #first problem
-    state['answer'] = displayProblem(q_label, answer_entry, a_label, state, difficulty)
+    state['answer'] = displayProblem(q_label,q_label2, answer_entry, a_label, state, difficulty)
 
 
 
